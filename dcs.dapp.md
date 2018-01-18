@@ -1,33 +1,33 @@
 ## The vox
 
 Let there be an object called the vox,
-  also known as "the feedback engine".
+  also known as _the feedback engine_.
 
 Let the vox par be a 27-decimal number,
-  also known as "the target price",
+  also known as _the target price_,
   initially by parameter.
 
 Let the vox fix be a 27-decimal number,
-  also known as "the market price",
+  also known as _the market price_,
   initially set to the vox par.
 
 Let the vox way be a 27-decimal number,
-  also known as "the target rate",
+  also known as _the target rate_,
   initially set to one.
 
 Let the vox how be a 27-decimal number,
-  also known as "the sensitivity parameter",
+  also known as _the sensitivity parameter_,
   initially set to the vox way.
 
 Let the vox tau be a timestamp,
-  also known as "the feedback timestamp",
+  also known as _the feedback timestamp_,
   initially set to now.
 
 
 ## The vat
 
 Let there be an object called the vat,
-  also known as "the CDP engine".
+  also known as _the CDP engine_.
 
 Let the vat know of the vox.
 
@@ -35,38 +35,38 @@ Let the vat know of the vox.
 ## The ilks
 
 Let there be a class of objects called the ilks,
-  also known as "the CDP types".
+  also known as _the CDP types_.
 
 Let the ilk know of the vox.
 
 Let the ilk mat be an 18-decimal number,
-  also known as "the liquidation ratio",
+  also known as _the liquidation ratio_,
   initially set to zero.
 
 Let the ilk tax be a 27-decimal number,
-  also known as "the stability fee",
+  also known as _the stability fee_,
   initially set to zero.
 
 Let the ilk axe be a 27-decimal number,
-  also known as "the liquidation penalty",
+  also known as _the liquidation penalty_,
   initially set to zero.
 
 Let the ilk cap be an 18-decimal number,
-  also known as "the debt ceiling",
+  also known as _the debt ceiling_,
   initially set to zero.
 
 Let the ilk lax be a timestamp,
-  also known as "the grace period",
+  also known as _the grace period_,
   initially set to zero.
 
 Let the ilk chi be a 27-decimal number,
-  also known as "the fee accumulator",
+  also known as _the fee accumulator_,
   initially set to zero.
 
 Let the ilk rho be a timestamp,
-  also known as "the fee update time",
+  also known as _the fee update time_,
   initially set to zero.
 
 Let the ilk rum be an 18-decimal number,
-  also known as "the normalized debt",
+  also known as _the normalized debt_,
   initially set to zero.

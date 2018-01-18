@@ -82,7 +82,7 @@ pBoxDeclLine = do
   theBoxName <- pTheBox
   theAlias <-
     optional (words ", also known as" *> quotation)
-      <??> ", also known as \"...\""
+      <??> ", also known as _some alias_"
   pure (BoxDeclLine theBoxName theAlias Singleton)
 
 pClassDeclLine :: Parser MainLine
@@ -91,7 +91,7 @@ pClassDeclLine = do
   theClassName <- pTheClass
   theAlias <-
     optional (words ", also known as" *> quotation)
-      <??> ", also known as \"...\""
+      <??> ", also known as _some alias_"
   pure (BoxDeclLine theClassName theAlias Multitude)
 
 (<??>) :: Parser a -> Text -> Parser a
@@ -106,14 +106,14 @@ pVarDeclLine = do
   typeName <- pTypeName
   theAlias <-
     optional (words ", also known as" *> quotation)
-      <??> ", also known as \"...\""
+      <??> ", also known as _some alias_"
   words ", initially"
   varSource <- pVarSource
   pure (VarDeclLine varName typeName varSource theAlias)
 
 quotation :: Parser Text
 quotation =
-  pack <$> (char '"' *> some (notChar '"') <* char '"')
+  pack <$> (char '_' *> some (notChar '_') <* char '_')
 
 pVarName :: Parser VarName
 pVarName = do
