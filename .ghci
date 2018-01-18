@@ -1,0 +1,4 @@
+import Prelude (pure)
+import IPPrint.Colored
+:def cp (\_ -> pure ":set -interactive-print=IPPrint.Colored.cpprint")
+:def ncp (\_ -> pure ":set -interactive-print=print")

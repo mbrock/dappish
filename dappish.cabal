@@ -1,0 +1,65 @@
+name: dappish
+version: 0.5
+synopsis: A description language for Ethereum contract systems
+homepage: https://github.com/mbrock/dappish
+license: GPL-3
+license-file: LICENSE
+author: Mikael Brockman
+maintainer: mikael@brockman.se
+build-type: Simple
+cabal-version: >=1.10
+
+library
+  hs-source-dirs: src
+  default-language: Haskell2010
+  ghc-options: -O2 -Wall
+  exposed-modules:
+    Dappish,
+    Dappish.Prelude,
+    Dappish.Parser,
+    Dappish.Grok,
+    Dappish.Solidify
+  default-extensions:
+    NoImplicitPrelude,
+    OverloadedStrings,
+    LambdaCase,
+    DeriveDataTypeable,
+    MultiParamTypeClasses,
+    FunctionalDependencies,
+    FlexibleInstances,
+    FlexibleContexts
+  build-depends:
+    base == 4.*,
+    bytestring,
+    containers,
+    trifecta,
+    parsers,
+    ghci-pretty,
+    text,
+    lens,
+    mtl,
+    pretty
+
+executable dappish
+  main-is: Main.hs
+  hs-source-dirs: .
+  default-language: Haskell2010
+  ghc-options: -O2 -Wall -Werror -threaded
+  build-depends:
+    base == 4.*,
+    dappish,
+    bytestring,
+    containers,
+    text
+    
+test-suite test
+  default-language: Haskell2010
+  hs-source-dirs: test
+  ghc-options: -O2 -Wall -Werror
+  type: exitcode-stdio-1.0
+  main-is: Test.hs
+  build-depends:
+    base,
+    bytestring,
+    tasty,
+    text
