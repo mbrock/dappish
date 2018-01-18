@@ -45,7 +45,10 @@ pDappSpec :: Parser DappSpec
 pDappSpec = DappSpec <$> some pMainLine
 
 pMainLine :: Parser MainLine
-pMainLine =
+pMainLine = do
+  void . optional $ do
+    words "## "
+    void (some (Trifecta.noneOf "\n") >> newline >> newline)
   sentence
     (choice
        [ pBoxDeclLine

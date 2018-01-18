@@ -1,3 +1,5 @@
+## The vox
+
 Let there be an object called the vox,
   also known as "the feedback engine".
 
@@ -21,6 +23,8 @@ Let the vox tau be a timestamp,
   also known as "the feedback timestamp",
   initially set to now.
 
+
+## The vat
 
 Let there be an object called the vat,
   also known as "the CDP engine".
