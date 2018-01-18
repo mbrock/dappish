@@ -79,8 +79,8 @@ convertSimpleExpr :: TypeName -> SimpleExpr -> Doc
 convertSimpleExpr theTypeName = \case
   One ->
     case theTypeName of
-      Ray -> txt "RAY /* one */"
-      Wad -> txt "WAD /* one */"
+      Ray -> txt "ONE_27"
+      Wad -> txt "ONE_18"
       _ -> error "weird"
   Now ->
     case theTypeName of
@@ -94,11 +94,11 @@ commatized = hsep . punctuate (txt ",")
 
 convertVarDecl :: VarDecl -> Doc
 convertVarDecl x =
-  -- case view (name . alias) x of
-  --   Nothing ->
+  case view alias x of
+    Nothing ->
       decl
-    -- Just anAlias ->
-    --   hsep [decl, txt ("// aka \"" <> anAlias <> "\"")]
+    Just anAlias ->
+      hsep [decl, txt ("// \"" <> anAlias <> "\"")]
   where
     decl =
       hsep
@@ -109,6 +109,6 @@ convertVarDecl x =
 convertTypeName :: TypeName -> Doc
 convertTypeName =
   \case
-    Ray -> txt "uint /* 27 decimal */"
-    Wad -> txt "uint /* 18 decimal */"
-    Sec -> txt "uint64 /* timestamp */"
+    Ray -> txt "uint /* fixed-d27 */"
+    Wad -> txt "uint /* fixed-d18 */"
+    Sec -> txt "uint /* timestamp */"

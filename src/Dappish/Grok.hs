@@ -16,6 +16,7 @@ data VarDecl = VarDecl
   , varDeclIdx :: Idx VarDecl
   , varDeclTypeName :: TypeName
   , varDeclInit :: VarSource
+  , varDeclAlias :: Maybe Text
   } deriving (Show, Data)
 makeFields ''VarDecl
 
@@ -52,6 +53,7 @@ data Failure
   | XUnknownVar VarName
   | XCircularDefinition
   | XComplexInitialization BoxName VarName
+  | XVarTypeMismatch VarDecl VarDecl
   deriving (Show, Data)
 
 gensym :: MonadState (x, Integer) m => m (Idx a)
@@ -80,7 +82,7 @@ grok (DappSpec mainLines) =
             , boxDeclIdx = next
             , boxDeclVars = mempty
             }
-        VarDeclLine newVarName newTypeName newVarInit -> do
+        VarDeclLine newVarName newTypeName newVarInit newAlias -> do
           let theBoxName = view boxName newVarName
           case preview (boxDecls . ix theBoxName) old of
             Nothing ->
@@ -95,6 +97,7 @@ grok (DappSpec mainLines) =
                 , varDeclIdx = next
                 , varDeclTypeName = newTypeName
                 , varDeclInit = newVarInit
+                , varDeclAlias = newAlias
                 }
 
     stage1 :: StateT Grokked (Except Failure) ()
@@ -137,7 +140,8 @@ grok (DappSpec mainLines) =
                       throwError (XUnknownVar refVarName)
                     Just y ->
                       case view init y of
-                        ByParameter ->
+                        ByParameter -> do
+                          checkTypeEquality x y
                           pure (theVarName, view typeName x, The refVarName)
                         Initially (The _) ->
                           throwError $
@@ -148,3 +152,9 @@ grok (DappSpec mainLines) =
                   pure (theVarName, view typeName x, One)
                 Initially Now ->
                   pure (theVarName, view typeName x, Now)
+
+checkTypeEquality
+  :: MonadError Failure m => VarDecl -> VarDecl -> m ()
+checkTypeEquality x y =
+  unless (view typeName x == view typeName y)
+    (throwError (XVarTypeMismatch x y))

@@ -30,7 +30,7 @@ data TypeName = Ray | Wad | Sec
 
 data MainLine
   = BoxDeclLine BoxName
-  | VarDeclLine VarName TypeName VarSource
+  | VarDeclLine VarName TypeName VarSource (Maybe Text)
   deriving (Eq, Show, Data)
 
 data DappSpec = DappSpec [MainLine]

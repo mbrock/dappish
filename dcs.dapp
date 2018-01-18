@@ -1,14 +1,14 @@
-There is an object called the vox.
+Let there be an object called the vox.
 
 Let the vox par be a 27-decimal number,
   also known as "the target price",
   initially by parameter.
 
-Let the vox fix be an 18-decimal number,
+Let the vox fix be a 27-decimal number,
   also known as "the market price",
   initially set to the vox par.
 
-Let the vox way be an 18-decimal number,
+Let the vox way be a 27-decimal number,
   also known as "the target rate",
   initially set to one.
 

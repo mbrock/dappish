@@ -55,7 +55,7 @@ pMainLine =
 pBoxDeclLine :: Parser MainLine
 pBoxDeclLine =
   BoxDeclLine <$> do
-    words "There is an object called the"
+    words "Let there be an object called the"
     BoxName <$> name
 
 (<??>) :: Parser a -> Text -> Parser a
@@ -73,8 +73,7 @@ pVarDeclLine = do
       <??> ", also known as \"...\""
   words ", initially"
   varSource <- pVarSource
-  -- let theVarName = varName { varNameAlias = theAlias }
-  pure (VarDeclLine varName typeName varSource)
+  pure (VarDeclLine varName typeName varSource theAlias)
 
 quotation :: Parser Text
 quotation =
