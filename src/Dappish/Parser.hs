@@ -122,8 +122,8 @@ pVarName = do
 
 pTypeName :: Parser TypeName
 pTypeName = choice
-  [ words "a 27-decimal number" *> pure Ray
-  , words "an 18-decimal number" *> pure Wad
+  [ words "a precise rate" *> pure Ray
+  , words "a token quantity" *> pure Wad
   , words "a timestamp" *> pure Sec
   ]
 
