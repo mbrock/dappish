@@ -33,6 +33,7 @@ data BoxDecl = BoxDecl
   , boxDeclVars :: Map VarName VarDecl
   , boxDeclAlias :: Maybe Text
   , boxDeclKnows :: Set BoxDecl
+  , boxDeclKind :: BoxKind
   } deriving (Show, Data, Ord, Eq)
 makeFields ''BoxDecl
 
@@ -83,7 +84,7 @@ grok (DappSpec mainLines) =
     stage0 line = do
       (old, _) <- get
       case line of
-        BoxDeclLine newBoxName newAlias -> do
+        BoxDeclLine newBoxName newAlias newBoxKind -> do
           when
             (Map.member newBoxName (view boxDecls old))
             (throwError (XDuplicateBox newBoxName))
@@ -94,6 +95,7 @@ grok (DappSpec mainLines) =
             , boxDeclVars = mempty
             , boxDeclAlias = newAlias
             , boxDeclKnows = mempty
+            , boxDeclKind = newBoxKind
             }
         KnowOfLine boxNameA boxNameB -> do
           void $ zoom _1 (findBox boxNameA)
@@ -172,6 +174,8 @@ grok (DappSpec mainLines) =
                             XComplexInitialization theBoxName theVarName
                         Initially z ->
                           pure (theVarName, view typeName x, z)
+                Initially Zero ->
+                  pure (theVarName, view typeName x, Zero)
                 Initially One ->
                   pure (theVarName, view typeName x, One)
                 Initially Now ->

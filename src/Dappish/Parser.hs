@@ -35,6 +35,13 @@ fin = (space >> spaces) <|> void (lookAhead (oneOf ".,"))
 name :: Parser Text
 name = pack <$> some letter <* fin
 
+pluralName :: Parser Text
+pluralName = try $ do
+  s <- pack <$> some letter <* fin
+  unless ("s" `isSuffixOf` s)
+    (raiseErr (failed "expected a plural noun"))
+  pure (Text.dropEnd 1 s)
+
 period :: Parser ()
 period = char '.' >> space >> spaces
 
@@ -52,6 +59,7 @@ pMainLine = do
   sentence
     (choice
        [ pBoxDeclLine
+       , pClassDeclLine
        , pVarDeclLine
        , pKnowOfLine
        ])
@@ -65,6 +73,9 @@ pKnowOfLine = try $
 pTheBox :: Parser BoxName
 pTheBox = BoxName <$> (words "the" *> name)
 
+pTheClass :: Parser BoxName
+pTheClass = BoxName <$> (words "the" *> pluralName)
+
 pBoxDeclLine :: Parser MainLine
 pBoxDeclLine = do
   words "Let there be an object called"
@@ -72,7 +83,16 @@ pBoxDeclLine = do
   theAlias <-
     optional (words ", also known as" *> quotation)
       <??> ", also known as \"...\""
-  pure (BoxDeclLine theBoxName theAlias)
+  pure (BoxDeclLine theBoxName theAlias Singleton)
+
+pClassDeclLine :: Parser MainLine
+pClassDeclLine = do
+  words "Let there be a class of objects called"
+  theClassName <- pTheClass
+  theAlias <-
+    optional (words ", also known as" *> quotation)
+      <??> ", also known as \"...\""
+  pure (BoxDeclLine theClassName theAlias Multitude)
 
 (<??>) :: Parser a -> Text -> Parser a
 a <??> b = a <?> unpack ("«" <> b <> "»")
@@ -115,7 +135,8 @@ pVarSource = choice
 
 pSimpleExpr :: Parser SimpleExpr
 pSimpleExpr = choice
-  [ words "one" *> pure One
+  [ words "zero" *> pure Zero
+  , words "one" *> pure One
   , words "now" *> pure Now
   , words "the" *> (The <$> pVarName)
   ]

@@ -73,14 +73,25 @@ convertConstructor g aBoxDecl =
       , "="
       , txt ("_" <> view text x <> ";")
       ]
-    convertAssignment (theVarName, theTypeName, theSimpleExpr) = hsep
-      [ txt (view text theVarName)
-      , "="
-      , convertSimpleExpr theTypeName theSimpleExpr <> txt ";"
-      ]
+    convertAssignment (theVarName, theTypeName, theSimpleExpr) =
+      case theSimpleExpr of
+        Zero ->
+          hsep [ "//", txt (view text theVarName), "is zero" ]
+        _ ->
+          hsep
+            [ txt (view text theVarName)
+            , "="
+            , convertSimpleExpr theTypeName theSimpleExpr <> txt ";"
+            ]
 
 convertSimpleExpr :: TypeName -> SimpleExpr -> Doc
 convertSimpleExpr theTypeName = \case
+  Zero ->
+    case theTypeName of
+      Ray -> txt "0"
+      Wad -> txt "0"
+      Sec -> txt "0"
+      _ -> error "weird"
   One ->
     case theTypeName of
       Ray -> txt "ONE_D27"

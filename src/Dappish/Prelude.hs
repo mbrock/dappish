@@ -30,7 +30,7 @@ import Control.Monad.State as X
 import Data.Data as X (Data)
 import Data.Foldable as X (foldr, foldl', toList)
 import Data.Monoid as X
-import Data.Text as X (Text, pack, unpack)
+import Data.Text as X (Text, pack, unpack, isSuffixOf)
 import Data.Map.Strict as X (Map)
 import Data.List as X (sort, sortBy, filter, concat)
 import Data.Function as X (on)
