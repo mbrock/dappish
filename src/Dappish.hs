@@ -17,7 +17,7 @@ main = do
 
 dcs :: IO ()
 dcs = do
-  Just x <- parseFromFile "dcs.dapp"
+  Just x <- parseFromFile "dcs.dapp.md"
   case grok x of
     Left e ->
       print e
