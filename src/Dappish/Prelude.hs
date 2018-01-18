@@ -19,6 +19,7 @@ import Prelude as X
   , elem
   , print
   , putStrLn
+  , error
   )
 
 import Control.Applicative as X
@@ -31,8 +32,10 @@ import Data.Foldable as X (foldr, foldl')
 import Data.Monoid as X
 import Data.Text as X (Text, pack, unpack)
 import Data.Map.Strict as X (Map)
-import Data.List as X (sort, sortBy)
+import Data.List as X (sort, sortBy, filter)
 import Data.Function as X (on)
+import Data.Void as X
+import Data.Char as X (toUpper)
 
 sortOn :: Ord b => (a -> b) -> [a] -> [a]
 sortOn f = sortBy (compare `on` f)

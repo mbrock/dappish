@@ -20,24 +20,85 @@ convert :: Grokked -> Doc
 convert x = vcat
   [ txt "pragma solidity ^0.4.19;"
   , txt ""
-  , vcat (map convertBoxDecl (Map.elems x))
+  , txt "import \"ds-thing\";"
+  , txt ""
+  , vcat (map (convertBoxDecl x) (Map.elems (view boxDecls x)))
   ]
 
-convertBoxDecl :: BoxDecl -> Doc
-convertBoxDecl x = vcat
-  [ txt "contract" <+> txt (view (name . text) x) <+> txt "{"
+convertBoxDecl :: Grokked -> BoxDecl -> Doc
+convertBoxDecl grokked x = vcat
+  [ hsep
+      [ txt "contract"
+      , txt (capitalize (view (name . text) x))
+      , "is DSThing"
+      , txt "{"
+      ]
   , nest 4 (vcat (map convertVarDecl (sortOn (view idx) (Map.elems (view vars x)))))
+  , nest 4 (convertConstructor grokked x)
   , txt "}"
   , txt ""
   ]
 
+capitalize :: Text -> Text
+capitalize = over _head toUpper
+
+convertConstructor :: Grokked -> BoxDecl -> Doc
+convertConstructor g aBoxDecl =
+  case preview (constructors . ix (view name aBoxDecl)) g of
+    Nothing -> mempty
+    Just x -> vcat
+      [ txt ""
+      , hsep
+          [ txt "function"
+          , txt (capitalize (view (boxName . text) x))
+          , parens (commatized (map convertParam (view params x)))
+          , "{"
+          ]
+      , nest 4 (vcat (map assignParam (view params x)))
+      , nest 4 (vcat (map convertAssignment (view assignments x)))
+      , txt "}"
+      ]
+
+  where
+    convertParam (x, y) = hsep
+      [ convertTypeName y
+      , txt ("_" <> view text x)
+      ]
+    assignParam (x, _) = hsep
+      [ txt (view text x)
+      , "="
+      , txt ("_" <> view text x <> ";")
+      ]
+    convertAssignment (theVarName, theTypeName, theSimpleExpr) = hsep
+      [ txt (view text theVarName)
+      , "="
+      , convertSimpleExpr theTypeName theSimpleExpr <> txt ";"
+      ]
+
+convertSimpleExpr :: TypeName -> SimpleExpr -> Doc
+convertSimpleExpr theTypeName = \case
+  One ->
+    case theTypeName of
+      Ray -> txt "RAY /* one */"
+      Wad -> txt "WAD /* one */"
+      _ -> error "weird"
+  Now ->
+    case theTypeName of
+      Sec -> txt "era()"
+      _ -> error "weird"
+  The x ->
+    txt (view text x)
+
+commatized :: [Doc] -> Doc
+commatized = hsep . punctuate (txt ",")
+
 convertVarDecl :: VarDecl -> Doc
 convertVarDecl x =
-  case view (name . alias) x of
-    Nothing ->
+  -- case view (name . alias) x of
+  --   Nothing ->
       decl
-    Just anAlias ->
-      hsep [decl, txt ("// aka \"" <> anAlias <> "\"")]
+    -- Just anAlias ->
+    --   hsep [decl, txt ("// aka \"" <> anAlias <> "\"")]
   where
     decl =
       hsep
@@ -48,6 +109,6 @@ convertVarDecl x =
 convertTypeName :: TypeName -> Doc
 convertTypeName =
   \case
-    Ray -> txt "uint128 /* ray */"
-    Wad -> txt "uint128 /* wad */"
-    Sec -> txt "uint64  /* sec */"
+    Ray -> txt "uint /* 27 decimal */"
+    Wad -> txt "uint /* 18 decimal */"
+    Sec -> txt "uint64 /* timestamp */"

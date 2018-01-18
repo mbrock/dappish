@@ -27,7 +27,11 @@ library
     MultiParamTypeClasses,
     FunctionalDependencies,
     FlexibleInstances,
-    FlexibleContexts
+    FlexibleContexts,
+    DataKinds,
+    TypeOperators,
+    KindSignatures,
+    TypeFamilies
   build-depends:
     base == 4.*,
     bytestring,

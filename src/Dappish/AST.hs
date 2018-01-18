@@ -14,7 +14,6 @@ makeFields ''BoxName
 data VarName = VarName
   { varNameBoxName :: BoxName
   , varNameText :: Text
-  , varNameAlias :: Maybe Text
   }
   deriving (Ord, Eq, Show, Data)
 

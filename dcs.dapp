@@ -1,27 +1,21 @@
 There is an object called the vox.
 
-The variable vox par is a ray, by parameter,
-  also known as "the target price".
+Let the vox par be a 27-decimal number,
+  also known as "the target price",
+  initially by parameter.
 
-The variable vox fix is a wad, initially the vox par,
-  also known as "the market price".
+Let the vox fix be an 18-decimal number,
+  also known as "the market price",
+  initially set to the vox par.
 
-The variable vox way is a ray, initially one,
-  also known as "the target rate".
+Let the vox way be an 18-decimal number,
+  also known as "the target rate",
+  initially set to one.
 
-The variable vox how is a ray, initially the vox way,
-  also known as "the sensitivity parameter".
+Let the vox how be a 27-decimal number,
+  also known as "the sensitivity parameter",
+  initially set to the vox way.
 
-The variable vox tau is a sec, initially now,
-  also known as "the feedback timestamp".
-
-All vox state can be read by anyone.
-
-When reading the vox par, you first prod the vox.
-When reading the vox way, you first prod the vox.
-
-The vox fix can be set; this is authorized and noted.
-The vox how can be set; this is authorized and noted.
-
-The vox has authorized actions: tell and frob.
-The vox has noted actions: tell and frob.
+Let the vox tau be a timestamp,
+  also known as "the feedback timestamp",
+  initially set to now.

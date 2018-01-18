@@ -65,20 +65,16 @@ pVarDeclLine :: Parser MainLine
 pVarDeclLine = do
   varName <-
     try $
-      (words "The variable" *> pVarName <* words "is a")
-        <??> "The variable <object> <name> is a <type>, ..."
+      (words "Let the" *> pVarName <* words "be")
+        <??> "Let the <object> <name> be <type>, ..."
   typeName <- pTypeName
-  words ","
-  varSource <-
-    choice
-      [ words "by parameter" *> pure ByParameter
-      , words "initially" *> (Initially <$> pSimpleExpr)
-      ]
   theAlias <-
     optional (words ", also known as" *> quotation)
       <??> ", also known as \"...\""
-  let theVarName = varName { varNameAlias = theAlias }
-  pure (VarDeclLine theVarName typeName varSource)
+  words ", initially"
+  varSource <- pVarSource
+  -- let theVarName = varName { varNameAlias = theAlias }
+  pure (VarDeclLine varName typeName varSource)
 
 quotation :: Parser Text
 quotation =
@@ -87,13 +83,19 @@ quotation =
 pVarName :: Parser VarName
 pVarName = do
   aBoxName <- BoxName <$> name
-  VarName aBoxName <$> name <*> pure Nothing
+  VarName aBoxName <$> name
 
 pTypeName :: Parser TypeName
 pTypeName = choice
-  [ words "ray" *> pure Ray
-  , words "wad" *> pure Wad
-  , words "sec" *> pure Sec
+  [ words "a 27-decimal number" *> pure Ray
+  , words "an 18-decimal number" *> pure Wad
+  , words "a timestamp" *> pure Sec
+  ]
+
+pVarSource :: Parser VarSource
+pVarSource = choice
+  [ words "by parameter" *> pure ByParameter
+  , words "set to" *> (Initially <$> pSimpleExpr)
   ]
 
 pSimpleExpr :: Parser SimpleExpr

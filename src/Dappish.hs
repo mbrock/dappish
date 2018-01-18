@@ -18,5 +18,8 @@ main = do
 dcs :: IO ()
 dcs = do
   Just x <- parseFromFile "dcs.dapp"
-  Right y <- pure (grok x)
-  putStrLn (unpack (solidify y))
+  case grok x of
+    Left e ->
+      print e
+    Right y ->
+      putStrLn (unpack (solidify y))
