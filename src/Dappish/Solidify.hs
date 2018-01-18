@@ -26,7 +26,7 @@ convert x = vcat
 convertBoxDecl :: BoxDecl -> Doc
 convertBoxDecl x = vcat
   [ txt "contract" <+> txt (view (name . text) x) <+> txt "{"
-  , nest 4 (vcat (map convertVarDecl (Map.elems (view vars x))))
+  , nest 4 (vcat (map convertVarDecl (sortOn (view idx) (Map.elems (view vars x)))))
   , txt "}"
   , txt ""
   ]

@@ -1,4 +1,4 @@
-module Dappish.Prelude (module X) where
+module Dappish.Prelude (module Dappish.Prelude, module X) where
 
 import Prelude as X
   ( Read (..), Show (..), read
@@ -11,6 +11,7 @@ import Prelude as X
   , Either (..)
   , IO
   , String
+  , Integer
   , (.)
   , ($)
   , flip
@@ -30,3 +31,8 @@ import Data.Foldable as X (foldr, foldl')
 import Data.Monoid as X
 import Data.Text as X (Text, pack, unpack)
 import Data.Map.Strict as X (Map)
+import Data.List as X (sort, sortBy)
+import Data.Function as X (on)
+
+sortOn :: Ord b => (a -> b) -> [a] -> [a]
+sortOn f = sortBy (compare `on` f)
