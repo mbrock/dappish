@@ -17,7 +17,7 @@ data VarDecl = VarDecl
   , varDeclTypeName :: TypeName
   , varDeclInit :: VarSource
   , varDeclAlias :: Maybe Text
-  } deriving (Show, Data)
+  } deriving (Show, Data, Ord, Eq)
 makeFields ''VarDecl
 
 data Constructor = Constructor
@@ -31,7 +31,9 @@ data BoxDecl = BoxDecl
   { boxDeclName :: BoxName
   , boxDeclIdx :: Idx BoxDecl
   , boxDeclVars :: Map VarName VarDecl
-  } deriving (Show, Data)
+  , boxDeclAlias :: Maybe Text
+  , boxDeclKnows :: Set BoxDecl
+  } deriving (Show, Data, Ord, Eq)
 makeFields ''BoxDecl
 
 data Grokked = Grokked
@@ -59,6 +61,15 @@ data Failure
 gensym :: MonadState (x, Integer) m => m (Idx a)
 gensym = Idx <$> (use _2 <* (_2 += 1))
 
+findBox
+  :: (MonadError Failure m, MonadState Grokked m)
+  => BoxName -> m BoxDecl
+findBox a =
+  preuse (boxDecls . ix a) >>=
+    \case
+      Nothing -> throwError (XUnknownBox a)
+      Just x  -> pure x
+
 grok :: DappSpec -> Either Failure Grokked
 grok (DappSpec mainLines) =
   case runExcept (execStateT (mapM_ stage0 mainLines) s0) of
@@ -72,7 +83,7 @@ grok (DappSpec mainLines) =
     stage0 line = do
       (old, _) <- get
       case line of
-        BoxDeclLine newBoxName -> do
+        BoxDeclLine newBoxName newAlias -> do
           when
             (Map.member newBoxName (view boxDecls old))
             (throwError (XDuplicateBox newBoxName))
@@ -81,7 +92,13 @@ grok (DappSpec mainLines) =
             { boxDeclName = newBoxName
             , boxDeclIdx = next
             , boxDeclVars = mempty
+            , boxDeclAlias = newAlias
+            , boxDeclKnows = mempty
             }
+        KnowOfLine boxNameA boxNameB -> do
+          void $ zoom _1 (findBox boxNameA)
+          boxB <- zoom _1 (findBox boxNameB)
+          _1 . boxDecls . ix boxNameA . knows . at boxB .= Just ()
         VarDeclLine newVarName newTypeName newVarInit newAlias -> do
           let theBoxName = view boxName newVarName
           case preview (boxDecls . ix theBoxName) old of
@@ -115,13 +132,20 @@ grok (DappSpec mainLines) =
           let
             theBoxName = view name theBoxDecl
             theVars = view vars theBoxDecl
+            theKnows = toList (view knows theBoxDecl)
           theAssignments <- inferConstructorAssignments theBoxName theVars
           constructors . at theBoxName .= Just Constructor
             { constructorBoxName = theBoxName
             , constructorParams =
-                map (\x -> (view name x, view typeName x))
-                  (filter ((== ByParameter) . view init)
-                    (sortOn (view idx) (Map.elems theVars)))
+                concat
+                  [ map (\x -> (view name x, view typeName x))
+                      (filter ((== ByParameter) . view init)
+                        (sortOn (view idx) (Map.elems theVars)))
+                  , map (\x -> ( VarName (view name x) (view (name . text) x)
+                               , TheBox (view name x)
+                               ))
+                      theKnows
+                  ]
             , constructorAssignments =
                 theAssignments
             }

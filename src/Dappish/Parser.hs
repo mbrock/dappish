@@ -50,13 +50,26 @@ pMainLine =
     (choice
        [ pBoxDeclLine
        , pVarDeclLine
+       , pKnowOfLine
        ])
 
+pKnowOfLine :: Parser MainLine
+pKnowOfLine = try $
+  KnowOfLine
+    <$> (words "Let" *> pTheBox)
+    <*> (words "know of" *> pTheBox)
+
+pTheBox :: Parser BoxName
+pTheBox = BoxName <$> (words "the" *> name)
+
 pBoxDeclLine :: Parser MainLine
-pBoxDeclLine =
-  BoxDeclLine <$> do
-    words "Let there be an object called the"
-    BoxName <$> name
+pBoxDeclLine = do
+  words "Let there be an object called"
+  theBoxName <- pTheBox
+  theAlias <-
+    optional (words ", also known as" *> quotation)
+      <??> ", also known as \"...\""
+  pure (BoxDeclLine theBoxName theAlias)
 
 (<??>) :: Parser a -> Text -> Parser a
 a <??> b = a <?> unpack ("«" <> b <> "»")

@@ -22,7 +22,7 @@ convert x = vcat
   , txt ""
   , txt "import \"ds-thing\";"
   , txt ""
-  , vcat (map (convertBoxDecl x) (Map.elems (view boxDecls x)))
+  , vcat (map (convertBoxDecl x) (sortOn (view idx) (Map.elems (view boxDecls x))))
   ]
 
 convertBoxDecl :: Grokked -> BoxDecl -> Doc
@@ -30,9 +30,13 @@ convertBoxDecl grokked x = vcat
   [ hsep
       [ txt "contract"
       , txt (capitalize (view (name . text) x))
+          <> case view alias x of
+               Nothing -> mempty
+               Just anAlias -> txt (" /* " <> anAlias <> " */")
       , "is DSThing"
       , txt "{"
       ]
+  , nest 4 (vcat (map convertKnowsOf (sortOn (view idx) (toList (view knows x)))))
   , nest 4 (vcat (map convertVarDecl (sortOn (view idx) (Map.elems (view vars x)))))
   , nest 4 (convertConstructor grokked x)
   , txt "}"
@@ -79,8 +83,8 @@ convertSimpleExpr :: TypeName -> SimpleExpr -> Doc
 convertSimpleExpr theTypeName = \case
   One ->
     case theTypeName of
-      Ray -> txt "ONE_27"
-      Wad -> txt "ONE_18"
+      Ray -> txt "ONE_D27"
+      Wad -> txt "ONE_D18"
       _ -> error "weird"
   Now ->
     case theTypeName of
@@ -92,13 +96,27 @@ convertSimpleExpr theTypeName = \case
 commatized :: [Doc] -> Doc
 commatized = hsep . punctuate (txt ",")
 
+convertKnowsOf :: BoxDecl -> Doc
+convertKnowsOf x =
+  case view alias x of
+    Nothing ->
+      decl
+    Just anAlias ->
+      hsep [decl, txt ("// " <> anAlias)]
+  where
+    decl =
+      hsep
+        [ convertTypeName (TheBox (view name x))
+        , txt (view (name . text) x) <> txt ";"
+        ]
+
 convertVarDecl :: VarDecl -> Doc
 convertVarDecl x =
   case view alias x of
     Nothing ->
       decl
     Just anAlias ->
-      hsep [decl, txt ("// \"" <> anAlias <> "\"")]
+      hsep [decl, txt ("// " <> anAlias)]
   where
     decl =
       hsep
@@ -112,3 +130,4 @@ convertTypeName =
     Ray -> txt "uint /* fixed-d27 */"
     Wad -> txt "uint /* fixed-d18 */"
     Sec -> txt "uint /* timestamp */"
+    TheBox x -> txt (capitalize (view text x))

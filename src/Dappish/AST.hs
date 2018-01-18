@@ -20,17 +20,18 @@ data VarName = VarName
 makeFields ''VarName
 
 data VarSource = ByParameter | Initially SimpleExpr
-  deriving (Eq, Show, Data)
+  deriving (Eq, Ord, Show, Data)
 
 data SimpleExpr = One | Now | The VarName
-  deriving (Eq, Show, Data)
+  deriving (Eq, Ord, Show, Data)
 
-data TypeName = Ray | Wad | Sec
-  deriving (Eq, Show, Data)
+data TypeName = Ray | Wad | Sec | TheBox BoxName
+  deriving (Eq, Ord, Show, Data)
 
 data MainLine
-  = BoxDeclLine BoxName
+  = BoxDeclLine BoxName (Maybe Text)
   | VarDeclLine VarName TypeName VarSource (Maybe Text)
+  | KnowOfLine BoxName BoxName
   deriving (Eq, Show, Data)
 
 data DappSpec = DappSpec [MainLine]
